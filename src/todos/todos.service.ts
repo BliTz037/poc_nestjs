@@ -25,7 +25,7 @@ export class TodosService {
     }
 
     findOne(id: string): Todo {
-        const result: Todo = this.todoListStatic.find(todo => todo.id === Number(id))
+        const result: Todo = this.todoListStatic.find(todo => todo.id === +id)
         if (!result)
             throw new NotFoundException("Bad id or Todo not found !");
         return result;
@@ -37,7 +37,7 @@ export class TodosService {
     }
 
     updateTodo(id: string, updateTodo: UpdateTodoDto): Todo {
-        let result: Todo = this.todoListStatic.find(todo => todo.id === Number(id))
+        let result: Todo = this.todoListStatic.find(todo => todo.id === +id)
         if (!result)
             throw new NotFoundException("Bad id or Todo not found !");
         
@@ -49,5 +49,14 @@ export class TodosService {
         const updatedTodos = this.todoListStatic.map(t => t.id !== +id ? t : result);
         this.todoListStatic = [...updatedTodos];
         return result;
+    }
+
+    deleteTodo(id: string) : any {
+        const lengthBeforeDelete: number = this.todoListStatic.length; 
+        this.todoListStatic = [... this.todoListStatic.filter(t => t.id !== +id)]
+        if (this.todoListStatic.length < lengthBeforeDelete )
+            return { "response": `Todo ${id} deleted !` };
+        else
+            throw new NotFoundException("Bad id or Todo not found !");
     }
 }
