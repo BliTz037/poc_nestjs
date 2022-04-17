@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  back-end:
+    container_name: NestAPI
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      PORT: 3000
+      DB_NAME: "todo"
+      DB_USER: "admin"
+      DB_PASSWORD: "123456"
+      DB_HOST: "postgres"
+      DB_DRIVER: "postgres"
+    ports:
+      - "3000:3000"
+    networks:
+      - back-tier
+
+  postgres:
+    container_name: DB-NestAPI
+    image: postgres
+    restart: always
+    networks:
+      - back-tier
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - db-NestAPI-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_DB: "todo"
+
+networks:
+  back-tier:
+
+volumes:
+  db-NestAPI-data:
