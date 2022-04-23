@@ -7,13 +7,8 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    environment:
-      PORT: 3000
-      DB_NAME: "todo"
-      DB_USER: "admin"
-      DB_PASSWORD: "123456"
-      DB_HOST: "postgres"
-      DB_DRIVER: "postgres"
+    env_file:
+      - docker.env
     volumes:
       - ./src:/src
     restart: unless-stopped
@@ -31,10 +26,8 @@ services:
     volumes:
       - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
       - db-NestAPI-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: "admin"
-      POSTGRES_PASSWORD: "123456"
-      POSTGRES_DB: "todo"
+    env_file:
+      - docker.env
 
 networks:
   back-tier:

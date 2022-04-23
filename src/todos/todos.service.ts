@@ -1,62 +1,49 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Todo } from './todos.interface';
+import Todos from './todos.entity';
 
 @Injectable()
 export class TodosService {
-    todoListStatic: Todo[] = [
-        {
-            id: 1,
-            name: "Regarder Mr.Robot",
-            description: "Saison 2",
-            isDone: false
-        },
-        {
-            id: 2,
-            name: "Boire de l'eau",
-            description: "Dans 20 ans il y'en aura plus :'(",
-            isDone: true
-        }
-    ]
 
-    findAll(): Todo[] {
-        return this.todoListStatic;
+    constructor(
+        @InjectRepository(Todos)
+        private todosRepository: Repository<Todos>
+    ) {}
+
+    async findAll() {
+        return await this.todosRepository.find();
     }
 
-    findOne(id: string): Todo {
-        const result: Todo = this.todoListStatic.find(todo => todo.id === +id)
-        if (!result)
-            throw new NotFoundException("Bad id or Todo not found !");
-        return result;
+    async findOne(id: string)  {
+        const todo = await this.todosRepository.findOne(id);
+        if (todo)
+            return todo;
+        throw new NotFoundException("Todo not found !");
     }
 
-    addTodo(todo: CreateTodoDto): Todo {
-        this.todoListStatic = [...this.todoListStatic, todo];
-        return this.todoListStatic[this.todoListStatic.length - 1];
+    async addTodo(todo: CreateTodoDto) {
+        const newTodo = await this.todosRepository.create(todo);
+        await this.todosRepository.save(newTodo);
+        return newTodo;
     }
 
-    updateTodo(id: string, updateTodo: UpdateTodoDto): Todo {
-        let result: Todo = this.todoListStatic.find(todo => todo.id === +id)
-        if (!result)
-            throw new NotFoundException("Bad id or Todo not found !");
-        
-        if (!updateTodo.hasOwnProperty('isDone') || !updateTodo.hasOwnProperty('name'))
-            throw new BadRequestException("You must give the parmas : isDone & name !");
-        result['name'] = updateTodo['name'];
-        result['isDone'] = updateTodo['isDone'];
-        result['description'] = updateTodo['description'] || result['description'];
-        const updatedTodos = this.todoListStatic.map(t => t.id !== +id ? t : result);
-        this.todoListStatic = [...updatedTodos];
-        return result;
+    async updateTodo(id: string, updateTodo: UpdateTodoDto): Promise<any> {
+
+        const updatedTodo = await this.todosRepository.findOne(id);
+        if (updateTodo)
+            return updateTodo
+        throw new NotFoundException("Todo not found !");
     }
 
-    deleteTodo(id: string) : any {
-        const lengthBeforeDelete: number = this.todoListStatic.length; 
-        this.todoListStatic = [... this.todoListStatic.filter(t => t.id !== +id)]
-        if (this.todoListStatic.length < lengthBeforeDelete )
+    async deleteTodo(id: string) : Promise<any> {
+        const deleteStatus = await this.todosRepository.delete(id)
+
+        if (deleteStatus.affected)
             return { "response": `Todo ${id} deleted !` };
         else
-            throw new NotFoundException("Bad id or Todo not found !");
+            throw new NotFoundException("Todo not found !");
     }
 }

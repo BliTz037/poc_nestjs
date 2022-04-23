@@ -1,12 +1,25 @@
+import * as Joi from '@hapi/joi';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TodosController } from './todos/todos.controller';
 import { TodosService } from './todos/todos.service';
+import { DatabaseModule } from './database/database.module';
+import { TodosModule } from './todos/todos.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController, TodosController],
-  providers: [AppService, TodosService],
+  imports: [ConfigModule.forRoot({
+    validationSchema: Joi.object({
+      POSTGRES_HOST: Joi.string().required(),
+      POSTGRES_PORT: Joi.number().required(),
+      POSTGRES_USER: Joi.string().required(),
+      POSTGRES_PASSWORD: Joi.string().required(),
+      POSTGRES_DB: Joi.string().required(),
+      PORT: Joi.number(),
+    })
+  }), DatabaseModule, TodosModule],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
