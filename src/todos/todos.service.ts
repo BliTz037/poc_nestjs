@@ -31,10 +31,10 @@ export class TodosService {
     }
 
     async updateTodo(id: string, updateTodo: UpdateTodoDto): Promise<any> {
-
+        await this.todosRepository.update(id, updateTodo);
         const updatedTodo = await this.todosRepository.findOne(id);
-        if (updateTodo)
-            return updateTodo
+        if (updatedTodo)
+            return updatedTodo
         throw new NotFoundException("Todo not found !");
     }
 
