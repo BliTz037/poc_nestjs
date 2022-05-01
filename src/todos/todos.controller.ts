@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { TodosService } from './todos.service';
@@ -18,6 +19,7 @@ export class TodosController {
     }
 
     @Post()
+    @UseGuards(JwtAuthenticationGuard)
     addTodo(@Body() createTodoDto: CreateTodoDto) : any {
         return this.todosService.addTodo(createTodoDto)
     }
