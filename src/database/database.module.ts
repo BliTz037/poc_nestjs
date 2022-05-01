@@ -17,7 +17,7 @@ console.log(__dirname);
                 password: configService.get("POSTGRES_PASSWORD"),
                 database: configService.get("POSTGRES_DB"),
                 entities: [
-                    __dirname + '/../todos/*.entity*{.ts,.js}'
+                    __dirname + '/../**/*.entity*{.ts,.js}'
                 ],
                 synchronize: true,
             })

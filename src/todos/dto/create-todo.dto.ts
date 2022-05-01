@@ -1,4 +1,4 @@
-import { IsBooleanString, IsNotEmpty, IsNumberString } from "class-validator";
+import { IsBooleanString, IsNotEmpty } from "class-validator";
 
 export class CreateTodoDto {
     @IsNotEmpty()
